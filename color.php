@@ -45,7 +45,7 @@ function create_image($w, $h, $r, $g, $b)
  *
  * @param int $w Width
  * @param int $h Height
- * @param int $hex Color in 6 figures hexadecimal
+ * @param int $hex Color in 6 or 3 figures hexadecimal
  */
 function create_image_hex($w, $h, $hex)
 {
@@ -63,19 +63,10 @@ function create_image_hex($w, $h, $hex)
   } else if ($len === 3) {
     list($r, $g, $b) = sscanf(strtolower($hex), "%1x%1x%1x");
 
-    // Conver the values to 6 figures hex
-    $r = dechex($r);
-    $g = dechex($g);
-    $b = dechex($b);
-
-    $r .= $r;
-    $g .= $g;
-    $b .= $b;
-
-    // Convert back to decimal
-    $r = hexdec($r);
-    $g = hexdec($g);
-    $b = hexdec($b);
+    // Convert the 3 figures hex to decimal
+    $r = hexdec(str_repeat(dechex($r), 2));
+    $g = hexdec(str_repeat(dechex($g), 2));
+    $b = hexdec(str_repeat(dechex($b), 2));
   }
 
   create_image($w, $h, $r, $g, $b);

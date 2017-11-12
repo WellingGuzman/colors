@@ -10,7 +10,7 @@
 function check_color($value)
 {
   if ($value < 0 || $value > 255) {
-    throw \Exception(sprintf(
+    throw new \Exception(sprintf(
       'invalid RGB Value. %s needs to be between 0-255', $value)
     );
   }
@@ -53,8 +53,30 @@ function create_image_hex($w, $h, $hex)
     $hex = substr($hex, 1);
   }
 
-  // TODO: Support 3 figures hexadecimal
-  list($r, $g, $b) = sscanf(strtolower($hex), "%2x%2x%2x");
+  $len = strlen($hex);
+  if ($len !== 3 && $len !== 6) {
+    throw new \Exception('invalid hex value length. 3 or 6 digits allowed');
+  }
+
+  if ($len === 6) {
+    list($r, $g, $b) = sscanf(strtolower($hex), "%2x%2x%2x");
+  } else if ($len === 3) {
+    list($r, $g, $b) = sscanf(strtolower($hex), "%1x%1x%1x");
+
+    // Conver the values to 6 figures hex
+    $r = dechex($r);
+    $g = dechex($g);
+    $b = dechex($b);
+
+    $r .= $r;
+    $g .= $g;
+    $b .= $b;
+
+    // Convert back to decimal
+    $r = hexdec($r);
+    $g = hexdec($g);
+    $b = hexdec($b);
+  }
 
   create_image($w, $h, $r, $g, $b);
 }

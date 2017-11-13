@@ -17,6 +17,38 @@ function check_color($value)
 }
 
 /**
+ * Gets RGB color from hex
+ *
+ * @param int $hex
+ *
+ * @return array
+ */
+function get_color_from_hex($hex)
+{
+  if ($hex[0] === '#') {
+    $hex = substr($hex, 1);
+  }
+
+  $len = strlen($hex);
+  if ($len !== 3 && $len !== 6) {
+    throw new \Exception('invalid hex value length. 3 or 6 digits allowed');
+  }
+
+  if ($len === 6) {
+    list($r, $g, $b) = sscanf(strtolower($hex), "%2x%2x%2x");
+  } else if ($len === 3) {
+    list($r, $g, $b) = sscanf(strtolower($hex), "%1x%1x%1x");
+
+    // Convert the 3 figures hex to decimal
+    $r = hexdec(str_repeat(dechex($r), 2));
+    $g = hexdec(str_repeat(dechex($g), 2));
+    $b = hexdec(str_repeat(dechex($b), 2));
+  }
+
+  return [$r, $g, $b];
+}
+
+/**
  * Dump a image data
  *
  * @param int $w Width
@@ -49,25 +81,7 @@ function create_image($w, $h, $r, $g, $b)
  */
 function create_image_hex($w, $h, $hex)
 {
-  if ($hex[0] === '#') {
-    $hex = substr($hex, 1);
-  }
-
-  $len = strlen($hex);
-  if ($len !== 3 && $len !== 6) {
-    throw new \Exception('invalid hex value length. 3 or 6 digits allowed');
-  }
-
-  if ($len === 6) {
-    list($r, $g, $b) = sscanf(strtolower($hex), "%2x%2x%2x");
-  } else if ($len === 3) {
-    list($r, $g, $b) = sscanf(strtolower($hex), "%1x%1x%1x");
-
-    // Convert the 3 figures hex to decimal
-    $r = hexdec(str_repeat(dechex($r), 2));
-    $g = hexdec(str_repeat(dechex($g), 2));
-    $b = hexdec(str_repeat(dechex($b), 2));
-  }
+  list($r, $g, $b) = get_color_from_hex($hex);
 
   create_image($w, $h, $r, $g, $b);
 }

@@ -27,10 +27,6 @@ function check_color($value)
  */
 function get_color_from_hex($hex)
 {
-  if ($hex[0] === '#') {
-    $hex = substr($hex, 1);
-  }
-
   $len = strlen($hex);
   if ($len !== 3 && $len !== 6) {
     throw new \Exception('invalid hex value length. 3 or 6 digits allowed');
@@ -96,9 +92,19 @@ function create_image($path, $w, $h, $r, $g, $b, array $options = [])
  * @param int $h Height
  * @param int $hex Color in 6 or 3 figures hexadecima
  * @param array $optionsl
+ *
+ * @throws \Exception
  */
 function create_image_hex($path, $w, $h, $hex, $options = [])
 {
+  if ($hex[0] === '#') {
+    $hex = substr($hex, 1);
+  }
+
+  if (!ctype_xdigit($hex)) {
+    throw \Exception('Invalid HEX value');
+  }
+
   list($r, $g, $b) = get_color_from_hex($hex);
 
   create_image($path, $w, $h, $r, $g, $b);

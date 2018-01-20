@@ -22,6 +22,8 @@ function check_color($value)
  * @param int $hex
  *
  * @return array
+ *
+ * @throws Exception
  */
 function get_color_from_hex($hex)
 {
@@ -51,13 +53,15 @@ function get_color_from_hex($hex)
 /**
  * Dump a image data
  *
+ * @param string|null $path file output path
  * @param int $w Width
  * @param int $h Height
  * @param int $r Red (0-255)
  * @param int $g Green (0-255)
  * @param int $b Blue (0-255)
+ * @param array $options Options
  */
-function create_image($w, $h, $r, $g, $b)
+function create_image($path, $w, $h, $r, $g, $b, array $options = [])
 {
   check_color($r);
   check_color($g);
@@ -65,10 +69,23 @@ function create_image($w, $h, $r, $g, $b)
 
   $img = imagecreate($w, $h);
   $background = imagecolorallocate($img, $r, $g, $b);
+  $type = isset($options['type']) ? $options['type'] : 'jpeg';
 
-  header('Content-Type: image/png');
-  imagepng($img);
-  imagecolordeallocate($img, $background);
+  header('Content-Type: image/' . $type);
+
+  switch ($type) {
+    case 'gif':
+      imagegif($img, $path);
+    case 'png':
+      imagepng($img, $path);
+      break;
+    case 'jpg':
+    case 'jpeg':
+    default:
+      imagejpeg($img, $path);
+      break;
+    }
+
   imagedestroy($img);
 }
 
@@ -77,11 +94,12 @@ function create_image($w, $h, $r, $g, $b)
  *
  * @param int $w Width
  * @param int $h Height
- * @param int $hex Color in 6 or 3 figures hexadecimal
+ * @param int $hex Color in 6 or 3 figures hexadecima
+ * @param array $optionsl
  */
-function create_image_hex($w, $h, $hex)
+function create_image_hex($path, $w, $h, $hex, $options = [])
 {
   list($r, $g, $b) = get_color_from_hex($hex);
 
-  create_image($w, $h, $r, $g, $b);
+  create_image($path, $w, $h, $r, $g, $b);
 }
